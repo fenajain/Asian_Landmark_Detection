@@ -37,13 +37,20 @@ def run():
     img = img.resize((256,256))
     st.image(img)
     img_file = st.file_uploader("Choose your Image", type=['png', 'jpg'])
-    if img_file is not None:
-        save_image_path = './Uploaded_Images/' + img_file.name
+     if img_file is not None:
+        save_image_path = os.path.join(UPLOAD_DIR, img_file.name)
         with open(save_image_path, "wb") as f:
             f.write(img_file.getbuffer())
-        prediction,image = image_processing(save_image_path)
-        st.image(image)
-        st.header("📍 **Predicted Landmark is: " + prediction + '**')
+        result_placeholder = st.empty()
+        with st.spinner('Running the analysis...'):
+            try:
+                prediction, image = image_processing(save_image_path)
+                st.image(image)
+                st.write('') # Top provide a gap
+                st.header("📍 **Predicted Landmark is: " + prediction + '**')
+            except Exception as e:
+                st.warning(e)
+        result_placeholder.write()
         try:
             address, latitude, longitude = get_map(prediction)
             st.success('Address: '+address )
