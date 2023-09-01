@@ -6,6 +6,7 @@ import tensorflow_hub as hub
 import numpy as np
 import pandas as pd
 from geopy.geocoders import Nominatim
+import os
 
 model_url = 'https://tfhub.dev/google/on_device_vision/classifier/landmarks_classifier_asia_V1/1'
 # model_url = 'on_device_vision_classifier_landmarks_classifier_asia_V1_1'
