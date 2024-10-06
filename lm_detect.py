@@ -40,7 +40,7 @@ model_url = 'https://tfhub.dev/google/on_device_vision/classifier/landmarks_clas
 # model_url = 'on_device_vision_classifier_landmarks_classifier_asia_V1_1'
 
 # label_url = 'https://www.gstatic.com/aihub/tfhub/labelmaps/landmarks_classifier_asia_V1_label_map.csv'
-labels = 'landmarks_classifier_asia_V1_label_map.csv'
+labels = 'landmark_detection_labels.csv'
 df = pd.read_csv(labels)
 labels = dict(zip(df.id, df.name))
 
