@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import PIL
 from PIL import Image
 import tensorflow as tf
@@ -31,29 +32,49 @@ def get_map(loc):
     location = geolocator.geocode(loc)
     return location.address,location.latitude, location.longitude
 
+import os  # Add this import for directory checks
+
 def run():
     st.title("Landmark Recognition")
     img = PIL.Image.open('logo.png')
-    img = img.resize((256,256))
+    img = img.resize((256, 256))
     st.image(img)
     img_file = st.file_uploader("Choose your Image", type=['png', 'jpg'])
+    
     if img_file is not None:
-        save_image_path = './Uploaded_Images/' + img_file.name
+        # Define the directory to save uploaded images
+        save_dir = './Uploaded_Images/'
+        
+        # Check if the directory exists; if not, create it
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+
+        # Full path where the uploaded image will be saved
+        save_image_path = os.path.join(save_dir, img_file.name)
+        
+        # Save the uploaded image to the directory
         with open(save_image_path, "wb") as f:
             f.write(img_file.getbuffer())
-        prediction,image = image_processing(save_image_path)
+        
+        # Process and display the image
+        prediction, image = image_processing(save_image_path)
         st.image(image)
         st.header("📍 **Predicted Landmark is: " + prediction + '**')
+        
         try:
             address, latitude, longitude = get_map(prediction)
-            st.success('Address: '+address )
-            loc_dict = {'Latitude':latitude,'Longitude':longitude}
-            st.subheader('✅ **Latitude & Longitude of '+prediction+'**')
+            st.success('Address: ' + address)
+            loc_dict = {'Latitude': latitude, 'Longitude': longitude}
+            st.subheader('✅ **Latitude & Longitude of ' + prediction + '**')
             st.json(loc_dict)
-            data = [[latitude,longitude]]
+
+            # Display location on map
+            data = [[latitude, longitude]]
             df = pd.DataFrame(data, columns=['lat', 'lon'])
-            st.subheader('✅ **'+prediction +' on the Map**'+'🗺️')
+            st.subheader('✅ **' + prediction + ' on the Map**' + '🗺️')
             st.map(df)
+        
         except Exception as e:
             st.warning("No address found!!")
+
 run()
