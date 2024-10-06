@@ -18,14 +18,24 @@ labels = dict(zip(df.id, df.name))
 
 def image_processing(image):
     img_shape = (321, 321)
-    classifier = tf.keras.Sequential([hub.KerasLayer(model_url, input_shape=img_shape + (3,), output_key="predictions:logits")])
+    
+    # Load the classifier model from TensorFlow Hub
+    classifier = tf.keras.Sequential([
+        hub.KerasLayer(model_url, input_shape=img_shape + (3,))
+    ])
+    
+    # Process the image
     img = PIL.Image.open(image)
     img = img.resize(img_shape)
     img1 = img
     img = np.array(img) / 255.0
     img = img[np.newaxis]
+    
+    # Perform prediction
     result = classifier.predict(img)
-    return labels[np.argmax(result)],img1
+    
+    # Ensure the output matches the expected format
+    return labels[np.argmax(result)], img1
 
 def get_map(loc):
     geolocator = Nominatim(user_agent="Your_Name")
