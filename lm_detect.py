@@ -47,8 +47,8 @@ labels = dict(zip(df.id, df.name))
 def image_processing(image):
     img_shape = (321, 321)
 
-    # Load the TensorFlow Hub model with the correct input shape
-    hub_layer = hub.KerasLayer(model_url, input_shape=img_shape + (3,))
+    # Load the TensorFlow Hub model with the correct input shape and specify the output_key
+    hub_layer = hub.KerasLayer(model_url, input_shape=img_shape + (3,), output_key="predictions:logits")
 
     # Open and preprocess the image
     img = PIL.Image.open(image)
@@ -58,10 +58,7 @@ def image_processing(image):
     img = img[np.newaxis]  # Add batch dimension
 
     # Perform prediction using the model
-    result = hub_layer(img)
-
-    # Access the 'predictions:logits' key from the result dictionary
-    logits = result['predictions:logits']
+    logits = hub_layer(img)
 
     # Get the predicted label using the logits
     predicted_label = labels[np.argmax(logits)]
