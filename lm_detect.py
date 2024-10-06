@@ -46,20 +46,24 @@ labels = dict(zip(df.id, df.name))
 
 def image_processing(image):
     img_shape = (321, 321)
-    classifier = tf.keras.Sequential(
-        [hub.KerasLayer(model_url, input_shape=img_shape + (3,), output_key="predictions:logits")])
+
+    # Load the TensorFlow Hub model directly
+    hub_layer = hub.KerasLayer(model_url, input_shape=img_shape + (3,))
+
+    # Open and preprocess the image
     img = PIL.Image.open(image)
     img = img.resize(img_shape)
-    img = img.convert('RGB')  # convert to 3-channel image
-    img1 = img
-    img = np.array(img) / 255.0
-    img = img[np.newaxis]
-    result = classifier.predict(img)
-    max_score = np.max(result)
-    if max_score < 0.5:  # set a threshold of 0.5 for the confidence score
-        return 'Not a landmark', img1
-    else:
-        return labels[np.argmax(result)], img1
+    img1 = img  # Save the original image for displaying later
+    img = np.array(img) / 255.0  # Normalize the image
+    img = img[np.newaxis]  # Add batch dimension
+
+    # Perform prediction using the model
+    result = hub_layer(img)  # Directly use the hub layer for predictions
+    
+    # Get the predicted label
+    predicted_label = labels[np.argmax(result)]
+    
+    return predicted_label, img1
 
 def get_map(loc):
     geolocator = Nominatim(user_agent="Your_Name")
